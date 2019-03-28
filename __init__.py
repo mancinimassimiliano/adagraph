@@ -1,0 +1,19 @@
+./
+    dataloaders/
+        __init__.py
+        compcars.py
+    src/
+        __init__.py
+        train.py
+        test.py
+    models/
+        __init__.py
+        residual.py
+        decaf.py
+        layers.py
+        networks.py
+    configs/
+        __init__.py
+        config_compcars.py
+        config_faces.py
+        opts.py
