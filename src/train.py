@@ -1,4 +1,9 @@
 # SET UP OPTIMIZERS AND TRAININGS
+import torch
+import torch,optim as optim
+import torch.nn as nn
+from layers import EntropyLoss
+from configs.opts import *
 
 
 
@@ -7,24 +12,24 @@
 def training_loop(net, loader, domain, epochs=10, training_group=["bn"], store=None, auxiliar=False):
     lr=LR
     if regress:
-	lr=lr*0.1
-	
+        lr=lr*0.1
+
     filter_params(net, training_group)
     optimizer = set_up_optim(net, lr, auxiliar, residual)
 
     for epoch in range(1, 1+epochs):
-	if epoch==STEP:
-		lr=lr*0.1
-		optimizer = set_up_optim(net, lr, auxiliar, residual)
+        if epoch==STEP:
+            lr=lr*0.1
+            optimizer = set_up_optim(net, lr, auxiliar, residual)
 
 	# Perform 1 training epoch
 	train(net, domain, loader, optimizer)
 
     if store is not None:
-	state={	
-		'state_dict': net.state_dict()
-	}
-	torch.save(state, store)
+        state={
+        'state_dict': net.state_dict()
+        }
+        torch.save(state, store)
 
 
 
@@ -40,31 +45,28 @@ def train(net, source, loader, optimizer):
 
     for batch_idx, (inputs, meta targets) in enumerate(loader):
         inputs = inputs.to(DEVICE)
-	targets = targets.to(DEVICE)
+        targets = targets.to(DEVICE)
 
-	if targets.size(0)==1:
-		continue
+        if targets.size(0)==1:
+            continue
 
-	current_domain=domain_converter(meta)
+        current_domain=domain_converter(meta)
 
-	# Produce features
+        # Produce features
         prediction = net(inputs, current_domain)
+        if current_domain==source:
+            loss=criterion(prediction, targets)
+        else:
+            loss=entropy(prediction)
 
-	if current_domain==source:
-		loss=criterion(prediction, targets)
-	else:
-		loss=entropy(prediction)
-
-
-	# Backward + update
+        # Backward + update
         loss.backward()
        	optimizer.step()
-	optimizer.zero_grad()
+        optimizer.zero_grad()
 
-	# safe_printing stuff
+        # safe_printing stuff
         train_loss += loss.item()
-
-    return (train_loss/(batch_idx+1))
+        return (train_loss/(batch_idx+1))
 
 
 
@@ -85,7 +87,7 @@ def filter_params(net, training_group):
 
 
 def set_up_optim(net, lr, auxiliar=False, residual=True):
-	if residual:
+    if residual:
 		if auxiliar:
 			optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=lr, weight_decay=DECAY)
 		else:
@@ -98,7 +100,7 @@ def set_up_optim(net, lr, auxiliar=False, residual=True):
 				{'params': net.layer4.parameters()},
 				{'params': net.fc.parameters(), 'lr': lr*10}
 			    ], lr=lr, weight_decay=DECAY)
+    else:
+        optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=lr, weight_decay=DECAY, momentum=MOMENTUM)
+        
 	return optimizer
-
-
-		
