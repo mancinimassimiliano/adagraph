@@ -2,7 +2,7 @@
 import torch
 import torch,optim as optim
 import torch.nn as nn
-from layers import EntropyLoss
+from models.layers import EntropyLoss
 from configs.opts import *
 
 
@@ -18,12 +18,11 @@ def training_loop(net, loader, domain, epochs=10, training_group=["bn"], store=N
     optimizer = set_up_optim(net, lr, auxiliar, residual)
 
     for epoch in range(1, 1+epochs):
+        # Perform 1 training epoch
+        train(net, domain, loader, optimizer)
         if epoch==STEP:
             lr=lr*0.1
             optimizer = set_up_optim(net, lr, auxiliar, residual)
-
-	# Perform 1 training epoch
-	train(net, domain, loader, optimizer)
 
     if store is not None:
         state={
@@ -102,5 +101,5 @@ def set_up_optim(net, lr, auxiliar=False, residual=True):
 			    ], lr=lr, weight_decay=DECAY)
     else:
         optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=lr, weight_decay=DECAY, momentum=MOMENTUM)
-        
+
 	return optimizer

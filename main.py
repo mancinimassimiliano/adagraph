@@ -10,7 +10,8 @@ def safe_print(x):
 		return
 
 
-
+if not RESIDUAL:
+    STD =
 
 
 # INSTANTIATE TRAINING
@@ -31,7 +32,7 @@ full_list=[]
 
 for meta in itertools.product(*DOMAINS)
 		full_list.append(meta)
-		meta_vectors[domain_converter(meta)]=torch.FloatTensor([float(i) for i in meta])
+		meta_vectors[domain_converter(meta)]=get_meta_vector(meta)
 
 for i,vector in enumerate(meta_vectors):
 	edge_vals[i,:]=compute_edge(vector,meta_vectors,i,1.)
@@ -61,13 +62,14 @@ for meta_source in itertools.product(*DOMAINS):
 
 			net_upperbound=copy.deepcopy(net_std)
 			net_upperbound.init_edges(edge_vals)   ##### CHOICE
+
 			training_loop(net_upperbound,upperbound_loader, idx_source, epochs=1, training_group=['bn','downsample.1'], store=None, auxiliar=True)
 
 			for meta_target in itertools.product(*DOMAINS):
 					target_domain=meta_target
 					idx_target=domain_converter(meta_target)
 
-					if idx_target == idx_source:
+					if idx_target == idx_source or skip_rule(meta_source,meta_target):
 						continue
 
 
