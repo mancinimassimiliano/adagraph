@@ -17,6 +17,9 @@ RESIDUAL = args.network == 'resnet'
 SKIP = args.skip
 SUFFIX = args.suffix
 
+STD = [0.229, 0.224, 0.225]
+SIZE = 224
+
 if DATASET == 'compcars':
     from configs.config_compcars import *
 

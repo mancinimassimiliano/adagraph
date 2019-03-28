@@ -1,6 +1,6 @@
 # SET UP OPTIMIZERS AND TRAININGS
 import torch
-import torch,optim as optim
+import torch.optim as optim
 import torch.nn as nn
 from models.layers import EntropyLoss
 from configs.opts import *
@@ -42,7 +42,7 @@ def train(net, source, loader, optimizer):
 
     optimizer.zero_grad()
 
-    for batch_idx, (inputs, meta targets) in enumerate(loader):
+    for batch_idx, (inputs, meta, targets) in enumerate(loader):
         inputs = inputs.to(DEVICE)
         targets = targets.to(DEVICE)
 
@@ -53,6 +53,7 @@ def train(net, source, loader, optimizer):
 
         # Produce features
         prediction = net(inputs, current_domain)
+
         if current_domain==source:
             loss=criterion(prediction, targets)
         else:
@@ -60,7 +61,7 @@ def train(net, source, loader, optimizer):
 
         # Backward + update
         loss.backward()
-       	optimizer.step()
+        optimizer.step()
         optimizer.zero_grad()
 
         # safe_printing stuff
@@ -86,11 +87,10 @@ def filter_params(net, training_group):
 
 
 def set_up_optim(net, lr, auxiliar=False, residual=True):
-    if residual:
-		if auxiliar:
-			optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=lr, weight_decay=DECAY)
-		else:
-			optimizer = optim.Adam([
+    if auxiliar or (not residual):
+        optimizer = optim.Adam(filter(lambda p: p.requires_grad, net.parameters()), lr=lr, weight_decay=DECAY)
+    else:
+        optimizer = optim.Adam([
 				{'params': net.conv1.parameters()},
 				{'params': net.bn1.parameters()},
 				{'params': net.layer1.parameters()},
@@ -98,8 +98,6 @@ def set_up_optim(net, lr, auxiliar=False, residual=True):
 				{'params': net.layer3.parameters()},
 				{'params': net.layer4.parameters()},
 				{'params': net.fc.parameters(), 'lr': lr*10}
-			    ], lr=lr, weight_decay=DECAY)
-    else:
-        optimizer = optim.SGD(filter(lambda p: p.requires_grad, net.parameters()), lr=lr, weight_decay=DECAY, momentum=MOMENTUM)
+		    ], lr=lr, weight_decay=DECAY)
 
-	return optimizer
+    return optimizer

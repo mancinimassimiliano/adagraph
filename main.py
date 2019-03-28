@@ -1,7 +1,10 @@
+import torch
+import itertools
+
 from configs.opts import *
-from models.networks import *
 from src.train import *
 from src.test import *
+from models.networks import get_network
 
 def safe_print(x):
 	try:
@@ -9,28 +12,21 @@ def safe_print(x):
 	except:
 		return
 
-
-if not RESIDUAL:
-    STD =
-
-
 # INSTANTIATE TRAINING
 
-NUM_DOMS=0
+NUM_DOMS=1
 for i in DOMAINS:
 	NUM_DOMS*=len(i)
 
 # LOAD NETWORK
 net = get_network(CLASSES, NUM_DOMS, residual=RESIDUAL)
 
-NUM_META = len(DOMAINS)
-
 meta_vectors = torch.FloatTensor(NUM_DOMS,NUM_META).fill_(0)
 edge_vals=torch.FloatTensor(NUM_DOMS,NUM_DOMS).fill_(0)
 edge_vals_no_self=torch.FloatTensor(NUM_DOMS,NUM_DOMS).fill_(0)
 full_list=[]
 
-for meta in itertools.product(*DOMAINS)
+for meta in itertools.product(*DOMAINS):
 		full_list.append(meta)
 		meta_vectors[domain_converter(meta)]=get_meta_vector(meta)
 
@@ -45,14 +41,13 @@ res_upperbound=[]
 res_adagraph=[]
 res_adagraph_refinement_stats=[]
 res_adagraph_refinement=[]
-
-upperbound_loader=init_ordered_loader(BATCH_SIZE, domains=full_list)
+upperbound_loader=init_loader(BATCH_SIZE, domains=full_list, auxiliar= True, size=SIZE, std=STD)
 
 for meta_source in itertools.product(*DOMAINS):
 			source_domain=meta_source
 
 			net_std=copy.deepcopy(net).to(DEVICE)
-			source_loader = init_loader(BATCH_SIZE,domains=[source_domain], shuffle=True)
+			source_loader = init_loader(BATCH_SIZE, domains=[source_domain], shuffle=True, auxiliar=False, size=SIZE, std=STD)
 			idx_source=domain_converter(source_domain)
 
 			net_std.reset_edges()
@@ -81,22 +76,20 @@ for meta_source in itertools.product(*DOMAINS):
 					current_edges=current_edges/current_edges.sum(-1).unsqueeze(-1)
 					current_edges[idx_target,:]=0.0
 
-					domain_regressor=full_list[:]
-					domain_regressor.remove(target_domain)
+					available_domains=full_list[:]
+					available_domains.remove(target_domain)
 
-					regression_loader=init_ordered_loader(BATCH_SIZE, domains=domain_regressor)
+					auxiliar_loader=init_loader(BATCH_SIZE, domains=available_domains, auxiliar=True, size=SIZE, std=STD)
 
 					net_adagraph=copy.deepcopy(net_std)
 					net_adagraph.init_edges(current_edges)
 
-					training_loop(net_adagraph,regression_loader, idx_source, epochs=1, training_group=['bn','downsample.1'], store=None, auxiliar=True)
+					training_loop(net_adagraph,auxiliar_loader, idx_source, epochs=1, training_group=['bn','downsample.1'], store=None, auxiliar=True)
 
-					target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False)
-					test_loader = init_loader(TEST_BATCH_SIZE, domains=[target_domain], shuffle=False)
+					target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
+					test_loader = init_loader(TEST_BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 
-
-				    current_res_source = test(net_std, test_loader, idx_source)
-
+					current_res_source = test(net_std, test_loader, idx_source)
 
 					net_adagraph.set_bn_from_edge1d(idx_target, ew=edge_vals[idx_target,:])
 					net_adagraph.init_edges(edge_vals)
