@@ -1,1 +1,92 @@
 # SET UP EVALUATION
+
+
+
+
+# Test
+def test(net, loader, domain, device='cuda'):
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, meta, targets) in enumerate(loader):
+            inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
+
+	    if domain is None:
+		current_domain = domain_converter(meta[0])
+	    else:
+		current_domain = domain 
+
+            outputs= net(inputs,current_domain)
+
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+    # Save checkpoint.
+    acc = 100.*correct/total
+    #safe_print('Test accuracy: ' + str(acc))
+    return acc
+
+
+
+def single_eval(net,inputs,domain,targets):
+	net.eval()
+	output = net(inputs,domain)
+	output.detach()
+	_, predicted = output.max(1)
+	correct = predicted.eq(targets).sum().item()
+	return correct
+
+
+def single_update(net,inputs,domain,optimizer=None, criterion=None):
+	if optimizer is not None and criterion is not None:
+		optimizer.zero_grad()
+		net.train()
+		prediction=net(inputs,domain)
+		loss=criterion(prediction)
+		loss.backward()
+		optimizer.step()
+		net.eval()
+	else:
+		with torch.no_grad():
+			net.train()
+			net(inputs,domain)
+			net.eval()
+
+
+
+# Full training procedure
+def online_test(net, domain, loader_online,device='cuda'):
+	net_updated = copy.deepcopy(net)
+	net_entropy = copy.deepcopy(net_entropy)
+
+	correct_updated=0.
+	correct_entropy=0.
+
+	totals=0.
+
+	criterion=EntropyLoss()
+	optimizer = set_up_optim(net_entropy, lr, training_group, auxiliar=True, residual=True):
+
+
+	for batch_idx, (inputs, meta, targets) in enumerate(loader_online):
+						if domain is None:
+							current_domain = domain_converter(meta[0])
+						else:
+							current_domain = domain
+
+				   		inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
+				
+				    		totals += targets.size(0)
+			    			
+				    		correct_updated += single_eval(net_updated, inputs, current_domain, targets)
+				    		correct_entropy += single_eval(net_entropy, inputs, current_domain, targets)
+						
+						if targets.size(0)>1:
+								single_update(net_updated, inputs, current_domain)
+								single_update(net_entropy, inputs, current_domain, optimizer, criterion)
+			
+	return 100.*correct_updated/totals, 100.*correct_entropy/totals
+	

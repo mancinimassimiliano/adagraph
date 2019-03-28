@@ -3,8 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 #### Definition of the Graph-based BN layer ####
-
-
 class GraphBN(nn.Module):
 
     # Init layer
@@ -37,8 +35,8 @@ class GraphBN(nn.Module):
 
     # Copy stats from source
     def copy_source(self, idx):
-	self.scale.data[:]=self.scale.data[:]*0.+self.scale[idx,:].data[:].view(1,-1)
-	self.bias.data[:]=self.bias.data[:]*0.+self.bias[idx,:].data[:].view(1,-1)
+	self.scale.data[:]=self.scale.data[:]*0.+self.scale[idx,:].data[:].unsqueeze(0)
+	self.bias.data[:]=self.bias.data[:]*0.+self.bias[idx,:].data[:].unsqueeze(0)
 	for d in range(self.domains):
 		self.bns[d].running_mean.data[:]=self.bns[idx].running_mean.data[:]
 		self.bns[d].running_var.data[:]=self.bns[idx].running_var.data[:]
@@ -90,18 +88,12 @@ class GraphBN(nn.Module):
 	scale=torch.FloatTensor(w.size(0),self.features).fill_(0.).to(self.scale.device)
 	bias=torch.FloatTensor(w.size(0),self.features).fill_(0.).to(self.scale.device)
 
-	probs = w.unsqueeze(2)#*self.edges.unsqueeze(0)).unsqueeze(3)
-	
+	probs = w.unsqueeze(2)
+
 	means = (probs*self.collected_means).sum(1)
 	stds = (probs*self.collected_stds).sum(1)
-	scale = (probs*self.scale.view(1,self.domains,self.features)).sum(1)
-	bias = (probs*self.bias.view(1,self.domains,self.features)).sum(1)
-
-	#print((means-(probs*self.collected_means.view(1,1,self.domains,-1)).sum(1).sum(1)).sum(),(stds-(probs*self.collected_stds.view(1,1,self.domains,-1)).sum(1).sum(1)).sum())
-
-	#print((scale-(probs*self.scale.view(1,1,self.domains,-1)).sum(1).sum(1)).sum(),(bias-(probs*self.bias.view(1,1,self.domains,-1)).sum(1).sum(1)).sum())
-	#means, stds=self.get_weighted_stats1d(1)
-	#scale,bias=self.combined_sb1d(1)
+	scale = (probs*self.scale.unsqueeze(0).sum(1)
+	bias = (probs*self.bias.unsqueeze(0).sum(1)
 
 	x=(x-means)/(torch.pow(stds+self.bns[0].eps,0.5))
         return scale*x+bias
@@ -113,13 +105,13 @@ class GraphBN(nn.Module):
 
     # Edges initialization
     def init_edges(self, edges):
-	self.edges=edges.to(self.scale.device).view(self.domains,self.domains,1)
+	self.edges=edges.to(self.scale.device).unsqueeze(-1)
 	self.edges.requires_grad=False
 
 
     # Set a single edge
     def set_edge(self,d,ws):
-	self.edges.data[d]=ws.to(self.edges.device).view(-1,1)
+	self.edges.data[d]=ws.to(self.edges.device).unsqueeze(-1)
 	self.edges.requires_grad=False
 
     # Get edges
@@ -131,7 +123,24 @@ class GraphBN(nn.Module):
     def get_sb(self):
 	return self.scale.data[:],self.bias.data[:]   
 
+    # Have all the edges with just the self connection on 
+    def reset_edges(self)
+	self.edges.data.fill_(0.)
+	eye = torch.eye(self.domains)
+	self.edges.data[i:i]+=eye
+
 		
 
 
+
+# Entropy loss definition
+class EntropyLoss(nn.Module):
+    ''' Module to compute entropy loss '''
+    def __init__(self):
+        super(EntropyLoss, self).__init__()
+
+    def forward(self, x):
+        b = F.softmax(x, dim=1) * F.log_softmax(x, dim=1)
+        b = -1.0 * b.sum(-1).mean()
+        return b
 
