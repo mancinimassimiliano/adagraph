@@ -16,7 +16,7 @@ def make_dataset(list_file, class_to_idx, extensions, domains):
     	lines = f.readlines()
     for l in lines:
         fname, domain, target = l.strip().split(' ')
-    	if has_file_allowed_extension(fname, extensions) and domain in domains:
+        if has_file_allowed_extension(fname, extensions) and domain in domains:
                     path = fname
                     item = (path, class_to_idx[target])
                     year,viewpoint=domain.split('-')
@@ -34,7 +34,7 @@ class Compcars(data.Dataset):
         loader = default_loader
 
         self.classes = classes
-        self.class_to_idx = {'1':0,'2':1,'3':2, '4':3}
+        self.class_to_idx = {'1':0,'2':1,'3':2,'4':3}
         samples, self.meta = make_dataset(list_file, self.class_to_idx, extensions, domains=domains)
 
         if len(samples) == 0:
