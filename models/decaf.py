@@ -64,9 +64,9 @@ class DomainPredictor(nn.Module):
 
 
 
-##################################
-##### Define AdaGraph ResNet #####
-##################################
+###################################
+##### Define AdaGraph AlexNet #####
+###################################
 
 
 class AlexNet_BVLC(nn.Module):
@@ -118,9 +118,6 @@ class AlexNet_BVLC(nn.Module):
             if isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
                 m.momentum=alpha
 
-    def do_stuff(self, x, t):
-	return
-
     def to_classes(self, num_classes):
 	num_ftrs = self.final.in_features
 	self.final = nn.Linear(num_ftrs, num_classes)
@@ -134,11 +131,9 @@ class AlexNet_BVLC(nn.Module):
 
 class AlexNet_BN(AlexNet_BVLC):
 
-    def __init__(self, num_classes=1000, dropout=False, bn_after=False):
+    def __init__(self, num_classes=1000, dropout=False):
         super(AlexNet_BN, self).__init__(num_classes=1000, dropout=False)
 	self.bn=nn.BatchNorm1d(4096)
-	self.bn2=nn.BatchNorm1d(4096)
-	self.bn_after=bn_after
 
 	for m in self.modules():
             if isinstance(m, nn.BatchNorm1d) or isinstance(m, nn.BatchNorm2d):
@@ -171,13 +166,12 @@ class AlexNet_BN(AlexNet_BVLC):
 
 
 
-class AlexNet_GraphBN(AlexNet_BN):
+class AlexNet_GraphBN(AlexNet_BVLC):
 
-    def __init__(self, num_classes=1000, dropout=False, bn_after=False, domains=29):
+    def __init__(self, num_classes=1000, dropout=False, domains=29):
         super(AlexNet_GraphBN, self).__init__(num_classes=1000, dropout=False)
 
 	self.bns=GraphBN(4096, domains=domains)
-
 	self.final=nn.Linear(4096, num_classes)
 
 
@@ -193,71 +187,16 @@ class AlexNet_GraphBN(AlexNet_BN):
         x = x.view(x.size(0), 256 * 6 * 6)
         x = self.classifier._modules['fc6'](x)
         x = self.classifier._modules['relu6'](x)
-        x1 = self.classifier._modules['fc7'](x)
-	x1 = x1.view(x1.shape[0],-1,1,1)
-	x = self.bns(x1,t)
+        x = self.classifier._modules['drop6'](x)
+        x = self.classifier._modules['fc7'](x)
+	x = x.view(x.shape[0],-1,1,1)
+	x = self.bns(x,t)
 	x = x.view(x.shape[0],-1)
         x = self.classifier._modules['relu7'](x)
 	x = self.final(x)
         return x
 
 
-
-##############################
-##### INSTANTIATE MODELS #####
-##############################
-
-# Standard ResNet
-def resnet18(pretrained=False, **kwargs):
-    """Constructs a ResNet-18 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
-    return model
-
-
-# AdaGraph ResNet
-def resnet18_domain(num_classes=4, domains=30, **kwargs):
-    	"""Constructs a ResNet-18 model.
-    	Args:
-        	num_classes (int): the number of classes of the classification model
-        	domains (int): the number of domains included in the model (#source + #auxuliary)
-    	"""
-
-	# Instantiate original ResNet
-    	model_origin = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
-    	model_origin.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
-
-	# Instatiate Domain ResNet
-    	model = DomainResNet(DomainBlock, [2, 2, 2, 2], domains=domains, **kwargs)
-
-	# Copy BN stats and params from the original to the domain-based
-	for m_orig in model_origin.named_modules():
-	    if 'bn' in m_orig[0] or 'downsample.1' in m_orig[0]:
-		for m_doms in model.named_modules():
-		    if m_doms[0]==m_orig[0]:
-		        for i in range(domains):
-		            m_doms[1].bns[i].running_var[:]=m_orig[1].running_var.data[:]
-		            m_doms[1].bns[i].running_mean[:]=m_orig[1].running_mean.data[:]          
-		            m_doms[1].scale.data[i,:]=m_orig[1].weight.data[:]                                   
-		            m_doms[1].bias.data[i,:]=m_orig[1].bias.data[:]
-
-	    elif 'conv' in m_orig[0] or 'downsample.0' in m_orig[0]:
-		for m_doms in model.named_modules():
-		    if m_doms[0]==m_orig[0]:
-		        m_doms[1].weight.data[:]=m_orig[1].weight.data[:]
-
-	# Init classifier    
-	num_ftrs = model.fc.in_features
-	model.fc = nn.Linear(num_ftrs, num_classes)
-        for m in model.modules():
-            if isinstance(m, nn.Linear):
-                m.weight.data.normal_(0,0.0001)
-
-    	return model
 
 
 
