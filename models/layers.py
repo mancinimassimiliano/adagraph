@@ -8,22 +8,21 @@ class GraphBN(nn.Module):
     # Init layer
     def __init__(self, features, domains=30,dim=2):
         super(GraphBN, self).__init__()
+        # Number of domains
+        self.domains=domains
 
-	# Number of domains
-	self.domains=domains
+        # Size of input features
+        self.features=features
 
-	# Size of input features
-	self.features=features
+        # Init BN considering 2 spatial dims
+        self.bns=nn.ModuleList([nn.BatchNorm2d(features,affine=False) for i in range(domains)])
 
-	# Init BN considering 2 spatial dims
-	self.bns=nn.ModuleList([nn.BatchNorm2d(features,affine=False) for i in range(domains)])
+        # Init scale and bias parameters
+        self.scale = nn.Parameter(torch.FloatTensor(domains,features).fill_(1.))
+        self.bias = nn.Parameter(torch.FloatTensor(domains,features).fill_(0.))
 
-	# Init scale and bias parameters
-	self.scale = nn.Parameter(torch.FloatTensor(domains,features).fill_(1.))
-	self.bias = nn.Parameter(torch.FloatTensor(domains,features).fill_(0.))
-
-	# Init edge values
-	self.edges=torch.FloatTensor(domains,domains,1).fill_(0.)
+        # Init edge values
+        self.edges=torch.FloatTensor(domains,domains,1).fill_(0.)
 
 
     # Forward pass with scale and bias obtained from the graph
@@ -87,8 +86,8 @@ class GraphBN(nn.Module):
         probs = w.unsqueeze(2)
         means = (probs*self.collected_means).sum(1)
         stds = (probs*self.collected_stds).sum(1)
-        scale = (probs*self.scale.unsqueeze(0).sum(1)
-        bias = (probs*self.bias.unsqueeze(0).sum(1)
+        scale = (probs*self.scale.unsqueeze(0)).sum(1)
+        bias = (probs*self.bias.unsqueeze(0)).sum(1)
         x=(x-means)/(torch.pow(stds+self.bns[0].eps,0.5))
         return scale*x+bias
 

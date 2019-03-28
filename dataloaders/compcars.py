@@ -73,7 +73,7 @@ class Compcars(data.Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return sample, meta[0]-2009, meta[1]-1, target
+        return sample, (meta[0], meta[1]), target
 
     def __len__(self):
         return len(self.samples)

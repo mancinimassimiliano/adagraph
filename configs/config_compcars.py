@@ -14,8 +14,6 @@ DECAY=0.000001
 MOMENTUM=0.9
 BANDWIDTH=0.1
 
-STD = [0.229, 0.224, 0.225]
-SIZE = 224
 
 DATES=['2009','2010','2011','2012','2013','2014']
 VIEWS=['1','2','3','4','5']
@@ -23,12 +21,15 @@ VIEWS=['1','2','3','4','5']
 CLASSES = 4
 
 DOMAINS = [DATES, VIEWS]
+NUM_META = 2
 
 DATALIST='.' #TO CHANGE
 
 
 def domain_converter(meta):
 	year, viewpoint = meta
+	year = int(year)-int(DATES[0])
+	viewpoint = int(viewpoint)-int(VIEWS[0])
 	return viewpoint*len(DATES)+year
 
 
@@ -43,7 +44,7 @@ def init_loader(bs, domains=[], shuffle=False, auxiliar= False, size=224, std=[0
 
     dataset = Compcars(DATALIST,['1','2','3','4'],transform=data_transform,domains=domains)
 
-    if auxiliar:
+    if not auxiliar:
         return torch.utils.data.DataLoader(dataset, batch_size=bs, drop_last=False,num_workers=4, shuffle=shuffle)
 
     else:
