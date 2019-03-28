@@ -6,12 +6,16 @@ from dataloaders.compcars import Compcars, CompcarsSampler
 # OPTS FOR COMPCARS
 BATCH_SIZE = 16
 TEST_BATCH_SIZE = 100
-EPOCHS= 10
-STEP=8
+
+EPOCHS= 6
+STEP=4
 LR=0.0001
 DECAY=0.000001
 MOMENTUM=0.9
 BANDWIDTH=0.1
+
+STD = [0.229, 0.224, 0.225]
+SIZE = 224
 
 DATES=['2009','2010','2011','2012','2013','2014']
 VIEWS=['1','2','3','4','5']
@@ -20,7 +24,7 @@ CLASSES = 4
 
 DOMAINS = [DATES, VIEWS]
 
-DATALIST='.'
+DATALIST='.' #TO CHANGE
 
 
 def domain_converter(meta):
@@ -46,12 +50,11 @@ def init_loader(bs, domains=[], shuffle=False, auxiliar= False, size=224, std=[0
         return torch.utils.data.DataLoader(dataset, batch_size=bs, drop_last=False,num_workers=4, sampler=CompcarsSampler(dataset,bs))
 
 
-
 def compute_edge(x,dt,idx, self_connection = 1.):
     edge_w=torch.exp(-torch.pow(torch.norm(x.view(1,-1)-dt,dim=1),2)/(2.*BANDWIDTH))
     edge_w[idx]=edge_w[idx]*self_connection
     return edge_w/edge_w.sum()
 
 
-def skip_rule(meta_source, meta_target):
-    return False
+def get_meta_vector(meta):
+	return torch.FloatTensor([float(i) for i in meta])

@@ -1,7 +1,6 @@
 # SET UP EVALUATION
 import torch
-import torch.nn as nn
-from layers import EntropyLoss
+from models.layers import EntropyLoss
 import copy_source
 from configs.opts import *
 from src.train import set_up_optim
@@ -72,7 +71,7 @@ def online_test(net, domain, loader_online,device='cuda'):
 	totals=0.
 
 	criterion=EntropyLoss()
-	optimizer = set_up_optim(net_entropy, lr, training_group, auxiliar=True, residual=True)
+	optimizer = set_up_optim(net_entropy, LR*0.1, training_group, auxiliar=True, residual=True)
 
     for batch_idx, (inputs, meta, targets) in enumerate(loader_online):
 						if domain is None:
