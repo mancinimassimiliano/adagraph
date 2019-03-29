@@ -125,7 +125,7 @@ class CompcarsSampler(torch.utils.data.sampler.Sampler):
 
 
     def _shuffle(self):
-        order=np.random.randint(len(self.keys),size=(len(self.data_source)/(self.bs)))
+        order=np.random.randint(len(self.keys),size=(len(self.data_source)//(self.bs)))
         sIdx=[]
         for i in order:
             sIdx=sIdx+self._sampling(self.keys[i],self.bs)
@@ -135,4 +135,4 @@ class CompcarsSampler(torch.utils.data.sampler.Sampler):
         return iter(self._shuffle())
 
     def __len__(self):
-        return len(self.data_source)/self.bs*self.bs
+        return len(self.data_source)//self.bs*self.bs

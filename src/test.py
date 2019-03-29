@@ -2,8 +2,8 @@
 import torch
 from models.layers import EntropyLoss
 from configs.opts import *
-from src.train import set_up_optim
-
+from src.train import set_up_optim, filter_params
+import copy
 
 
 # Test
@@ -59,16 +59,19 @@ def single_update(net,inputs,domain,optimizer=None, criterion=None):
 
 
 # Full training procedure
-def online_test(net, domain, loader_online,device='cuda'):
+def online_test(net, domain, loader_online,training_group=['bn'], device='cuda'):
     net_updated = copy.deepcopy(net)
-    net_entropy = copy.deepcopy(net_entropy)
+    net_entropy = copy.deepcopy(net)
 
     correct_updated=0.
     correct_entropy=0.
     totals=0.
 
     criterion=EntropyLoss()
-    optimizer = set_up_optim(net_entropy, LR*0.1, training_group, auxiliar=True, residual=True)
+
+    filter_params(net_entropy, training_group)
+    optimizer = set_up_optim(net_entropy, LR*0.1, auxiliar=True)
+
     for batch_idx, (inputs, meta, targets) in enumerate(loader_online):
         if domain is None:
             current_domain = domain_converter(meta[0])
