@@ -7,6 +7,7 @@ from src.test import *
 from models.networks import get_network
 
 import copy
+import numpy as np
 
 def safe_print(x):
 	try:
@@ -61,7 +62,7 @@ for meta_source in itertools.product(*DOMAINS):
 			net_upperbound=copy.deepcopy(net_std)
 			net_upperbound.init_edges(edge_vals)   ##### CHOICE
 
-			training_loop(net_upperbound,upperbound_loader, idx_source, epochs=1, training_group=['bn','downsample.1'], store=None, auxiliar=True)
+			training_loop(net_upperbound,upperbound_loader, idx_source, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
 			for meta_target in itertools.product(*DOMAINS):
 					target_domain=meta_target
@@ -70,6 +71,8 @@ for meta_source in itertools.product(*DOMAINS):
 					if idx_target == idx_source or skip_rule(meta_source,meta_target):
 						continue
 
+
+					safe_print(str(meta_source) + ' vs ' + str(meta_target))
 
 					current_edges=copy.deepcopy(edge_vals)
 					current_edges[:,idx_target]=0.0
@@ -87,14 +90,14 @@ for meta_source in itertools.product(*DOMAINS):
 					net_adagraph=copy.deepcopy(net_std)
 					net_adagraph.init_edges(current_edges)
 
-					training_loop(net_adagraph,auxiliar_loader, idx_source, epochs=1, training_group=['bn','downsample.1'], store=None, auxiliar=True)
+					training_loop(net_adagraph,auxiliar_loader, idx_source, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
 					target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 					test_loader = init_loader(TEST_BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 
 					current_res_source = test(net_std, test_loader, idx_source)
 
-					net_adagraph.set_bn_from_edge1d(idx_target, ew=edge_vals[idx_target,:])
+					net_adagraph.set_bn_from_edges(idx_target, ew=edge_vals[idx_target,:])
 					net_adagraph.init_edges(edge_vals)
 
 					current_res_adagraph = test(net_adagraph, test_loader, idx_target)
