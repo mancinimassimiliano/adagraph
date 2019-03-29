@@ -30,6 +30,8 @@ else:
     print("Please specify a valid dataset in [compcars,faces]")
     exit(1)
 
+TRAINING_GROUP = ['bn','downsample.1']
+
 if not RESIDUAL:
     EPOCHS = 10
     STEP = 7

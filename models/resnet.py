@@ -152,10 +152,10 @@ class DomainResNet(nn.Module):
         return x
 
 
-    def set_bn_from_edge1d(self,idx, ew=None):
+    def set_bn_from_edges(self,idx, ew=None):
         for m in self.modules():
             if isinstance(m, GraphBN):
-                m.set_bn_from_edge1d(idx,ew=ew)
+                m.set_bn_from_edges(idx,ew=ew)
 
 
     def copy_source(self,idx):
