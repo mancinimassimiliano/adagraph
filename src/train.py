@@ -42,6 +42,7 @@ def train(net, source, loader, optimizer):
 
     optimizer.zero_grad()
 
+
     for batch_idx, (inputs, meta, targets) in enumerate(loader):
         inputs = inputs.to(DEVICE)
         targets = targets.to(DEVICE)
@@ -66,6 +67,7 @@ def train(net, source, loader, optimizer):
 
         # safe_printing stuff
         train_loss += loss.item()
+
     return (train_loss/(batch_idx+1))
 
 
