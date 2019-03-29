@@ -163,6 +163,11 @@ class DomainResNet(nn.Module):
             if isinstance(m, GraphBN):
                 m.copy_source(idx)
 
+    def reset_edges(self):
+        for m in self.modules():
+            if isinstance(m, GraphBN):
+                m.reset_edges()
+
 
     def init_edges(self,edges):
         for m in self.modules():

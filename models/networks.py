@@ -4,7 +4,7 @@ from models.decaf import get_graph_net
 
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
-    'alexnet': './alexnet_caffe/alexnet_caffe.pth.tar'
+    'alexnet': '/home/mancini/works/ODA/alexnet_caffe/alexnet_caffe.pth.tar'
 }
 
 

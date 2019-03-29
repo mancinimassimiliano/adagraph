@@ -22,7 +22,7 @@ class GraphBN(nn.Module):
         self.bias = nn.Parameter(torch.FloatTensor(domains,features).fill_(0.))
 
         # Init edge values
-        self.edges=torch.FloatTensor(domains,domains,1).fill_(0.)
+        self.edges=torch.FloatTensor(domains,domains,1).fill_(0.).to('cuda')
 
 
     # Forward pass with scale and bias obtained from the graph
@@ -120,7 +120,7 @@ class GraphBN(nn.Module):
     def reset_edges(self):
         self.edges.data.fill_(0.)
         eye = torch.eye(self.domains)
-        self.edges.data[i:i]+=eye
+        self.edges.data[:]=eye.unsqueeze(-1)
 
 
 

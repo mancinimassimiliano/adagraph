@@ -11,18 +11,18 @@ from configs.opts import *
 # Full training procedure
 def training_loop(net, loader, domain, epochs=10, training_group=["bn"], store=None, auxiliar=False):
     lr=LR
-    if regress:
+    if auxiliar:
         lr=lr*0.1
 
     filter_params(net, training_group)
-    optimizer = set_up_optim(net, lr, auxiliar, residual)
+    optimizer = set_up_optim(net, lr, auxiliar, RESIDUAL)
 
     for epoch in range(1, 1+epochs):
         # Perform 1 training epoch
         train(net, domain, loader, optimizer)
         if epoch==STEP:
             lr=lr*0.1
-            optimizer = set_up_optim(net, lr, auxiliar, residual)
+            optimizer = set_up_optim(net, lr, auxiliar, RESIDUAL)
 
     if store is not None:
         state={
@@ -49,7 +49,7 @@ def train(net, source, loader, optimizer):
         if targets.size(0)==1:
             continue
 
-        current_domain=domain_converter(meta)
+        current_domain=domain_converter((meta[0][0],meta[1][0]))
 
         # Produce features
         prediction = net(inputs, current_domain)

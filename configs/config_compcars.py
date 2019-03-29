@@ -23,7 +23,7 @@ CLASSES = 4
 DOMAINS = [DATES, VIEWS]
 NUM_META = 2
 
-DATALIST='.' #TO CHANGE
+DATALIST='/home/mancini/data/oda/compcars/images.txt' #TO CHANGE
 
 
 def domain_converter(meta):
