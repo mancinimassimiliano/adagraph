@@ -6,6 +6,8 @@ from src.train import *
 from src.test import *
 from models.networks import get_network
 
+import copy
+
 def safe_print(x):
 	try:
 		print(x)
@@ -20,6 +22,7 @@ for i in DOMAINS:
 
 # LOAD NETWORK
 net = get_network(CLASSES, NUM_DOMS, residual=RESIDUAL)
+net = net.to(DEVICE)
 
 meta_vectors = torch.FloatTensor(NUM_DOMS,NUM_META).fill_(0)
 edge_vals=torch.FloatTensor(NUM_DOMS,NUM_DOMS).fill_(0)

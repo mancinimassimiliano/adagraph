@@ -7,6 +7,7 @@ import sys
 import numpy as np
 from PIL import Image
 
+from random import shuffle
 
 #### Here we filter the dataset according to the given metadata
 def make_dataset(list_file, class_to_idx, extensions, domains):
@@ -16,10 +17,10 @@ def make_dataset(list_file, class_to_idx, extensions, domains):
     	lines = f.readlines()
     for l in lines:
         fname, domain, target = l.strip().split(' ')
-        if has_file_allowed_extension(fname, extensions) and domain in domains:
+        year,viewpoint=domain.split('-')
+        if has_file_allowed_extension(fname, extensions) and (year,viewpoint) in domains:
                     path = fname
                     item = (path, class_to_idx[target])
-                    year,viewpoint=domain.split('-')
                     meta.append([int(year),int(viewpoint)])
                     images.append(item)
 
@@ -32,7 +33,6 @@ class Compcars(data.Dataset):
     def __init__(self, list_file, classes, transform=None, target_transform=None, domains=[]):
         extensions = IMG_EXTENSIONS
         loader = default_loader
-
         self.classes = classes
         self.class_to_idx = {'1':0,'2':1,'3':2,'4':3}
         samples, self.meta = make_dataset(list_file, self.class_to_idx, extensions, domains=domains)

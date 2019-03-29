@@ -174,7 +174,19 @@ class AlexNet_GraphBN(AlexNet_BVLC):
         x = self.final(x)
         return x
 
+    def reset_edges(self):
+        self.bns.reset_edges()
 
+    def set_bn_from_edge1d(self,idx, ew=None):
+        self.bns.set_bn_from_edge1d(idx,ew=ew)
+
+
+    def copy_source(self,idx):
+        self.bns.copy_source(idx)
+
+
+    def init_edges(self,edges):
+        self.bns.init_edges(edges)
 
 
 
