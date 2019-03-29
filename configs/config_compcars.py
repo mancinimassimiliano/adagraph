@@ -35,8 +35,8 @@ def domain_converter(meta):
 
 def init_loader(bs, domains=[], shuffle=False, auxiliar= False, size=224, std=[0.229, 0.224, 0.225]):
     data_transform=transforms.Compose([
-            transforms.Resize(256),
-                   transforms.CenterCrop(size),
+            transforms.Resize((size,size)),
+                   #transforms.CenterCrop(size),
                       transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], std)
          ])

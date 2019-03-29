@@ -66,7 +66,7 @@ def train(net, source, loader, optimizer):
 
         # safe_printing stuff
         train_loss += loss.item()
-        return (train_loss/(batch_idx+1))
+    return (train_loss/(batch_idx+1))
 
 
 
