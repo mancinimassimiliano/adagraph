@@ -150,6 +150,19 @@ class AlexNet_BN(AlexNet_BVLC):
         x = self.final(x)
         return x
 
+    def reset_edges(self):
+        return
+
+    def set_bn_from_edges(self,idx, ew=None):
+        return
+
+
+    def copy_source(self,idx):
+        return
+
+
+    def init_edges(self,edges):
+        return
 
 
 
