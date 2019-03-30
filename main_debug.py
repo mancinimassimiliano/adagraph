@@ -55,7 +55,7 @@ for meta_source in itertools.product(*DOMAINS):
 
 			net_std.reset_edges()
 
-			training_loop(net_std, source_loader, idx_source, epochs=EPOCHS, training_group=['bn','final'], store=None, auxiliar=False)
+			training_loop(net_std, source_loader, idx_source, epochs=EPOCHS, training_group=[''], store=None, auxiliar=False)
 			net_std.copy_source(idx_source)
 
 			for meta_target in itertools.product(*DOMAINS):

@@ -60,10 +60,8 @@ def single_update(net,inputs,domain,optimizer=None, criterion=None):
 
 # Full training procedure
 def online_test(net, domain, loader_online,training_group=['bn'], device='cuda'):
-    net_updated = copy.deepcopy(net)
     net_entropy = copy.deepcopy(net)
 
-    correct_updated=0.
     correct_entropy=0.
     totals=0.
 
@@ -81,11 +79,9 @@ def online_test(net, domain, loader_online,training_group=['bn'], device='cuda')
         inputs, targets = inputs.to(DEVICE), targets.to(DEVICE)
         totals += targets.size(0)
 
-        correct_updated += single_eval(net_updated, inputs, current_domain, targets)
         correct_entropy += single_eval(net_entropy, inputs, current_domain, targets)
 
         if targets.size(0)>1:
-            single_update(net_updated, inputs, current_domain)
             single_update(net_entropy, inputs, current_domain, optimizer, criterion)
 
-    return 100.*correct_updated/totals, 100.*correct_entropy/totals
+    return 100.*correct_entropy/totals

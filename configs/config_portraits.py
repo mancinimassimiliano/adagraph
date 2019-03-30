@@ -6,8 +6,8 @@ from dataloaders.portraits import *
 BATCH_SIZE = 16
 TEST_BATCH_SIZE = 100
 
-EPOCHS= 2
-STEP=1
+EPOCHS= 1
+STEP=2
 LR=0.0001
 DECAY=0.000001
 MOMENTUM=0.9
@@ -21,7 +21,7 @@ CLASSES = 2
 DOMAINS = [DATES, REGIONS]
 NUM_META = 3
 
-DATAROOT='.'
+DATAROOT='/home/mancini/data/oda/faces/'
 
 REGION_TO_VEC={'MA': [0,.1],'NE': [0.,0.],'South': [1.,1.], 'Pacific': [0.,3.], 'MW': [0.,2.]}
 
@@ -34,8 +34,8 @@ def domain_converter(meta):
 
 def init_loader(bs, domains=[], shuffle=False, auxiliar= False, size=224, std=[0.229, 0.224, 0.225]):
     data_transform=transforms.Compose([
-            transforms.Resize(256),
-        	transforms.CenterCrop(size),
+            transforms.Resize((size,size)),
+        	#transforms.CenterCrop(size),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], std)
          ])
