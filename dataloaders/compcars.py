@@ -112,14 +112,13 @@ class CompcarsSampler(torch.utils.data.sampler.Sampler):
                 self.dict_meta[str(y)+"-"+str(v)]=[idx]
                 self.keys.append(str(y)+"-"+str(v))
                 self.indeces[str(y)+"-"+str(v)]=0
-
         for idx in self.keys:
             shuffle(self.dict_meta[idx])
 
     def _sampling(self,idx, n):
         if self.indeces[idx]+n>=len(self.dict_meta[idx]):
             self.dict_meta[idx]=self.dict_meta[idx]+self.dict_meta[idx]
-            self.indeces[idx]=self.indeces[idx]+n
+        self.indeces[idx]=self.indeces[idx]+n
         return self.dict_meta[idx][self.indeces[idx]-n:self.indeces[idx]]
 
 

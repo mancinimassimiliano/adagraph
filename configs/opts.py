@@ -16,7 +16,7 @@ DATASET = args.dataset
 RESIDUAL = args.network == 'resnet'
 SKIP = args.skip
 SUFFIX = args.suffix
-
+SOURCE_GROUP = ['']
 STD = [0.229, 0.224, 0.225]
 SIZE = 224
 
@@ -38,13 +38,18 @@ if not RESIDUAL:
     STD = [1./256, 1./256, 1./256]
     SIZE = 227
     LR = 0.001
+    SOURCE_GROUP = ['bn','final']
 
 if SKIP == 'regions':
     def skip_rule(meta_source, meta_target):
-        return False
+        source_year, source_region = meta_source
+        target_year, target_region = meta_target
+        return source_year != target_year
 elif SKIP== 'years':
     def skip_rule(meta_source, meta_target):
-        return False
+        source_year, source_region = meta_source
+        target_year, target_region = meta_target
+        return source_region != target_region
 else:
     def skip_rule(meta_source, meta_target):
         return False

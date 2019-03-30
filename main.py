@@ -35,8 +35,8 @@ for meta in itertools.product(*DOMAINS):
 		meta_vectors[domain_converter(meta)]=get_meta_vector(meta)
 
 for i,vector in enumerate(meta_vectors):
-	edge_vals[i,:]=compute_edge(vector,meta_vectors,i,1.)
-	edge_vals_no_self[i,:]=compute_edge(vector,meta_vectors,i,0.)
+        edge_vals[i,:]=compute_edge(vector,meta_vectors,i,1.)
+        edge_vals_no_self[i,:]=compute_edge(vector,meta_vectors,i,0.)
 
 EXP=NUM_DOMS*(NUM_DOMS-1)
 
@@ -56,7 +56,7 @@ for meta_source in itertools.product(*DOMAINS):
 
 			net_std.reset_edges()
 
-			training_loop(net_std, source_loader, idx_source, epochs=EPOCHS, training_group=[''], store=None, auxiliar=False)
+			training_loop(net_std, source_loader, idx_source, epochs=EPOCHS, training_group=SOURCE_GROUP, store=None, auxiliar=False)
 			net_std.copy_source(idx_source)
 
 			net_upperbound=copy.deepcopy(net_std)
@@ -92,24 +92,22 @@ for meta_source in itertools.product(*DOMAINS):
 
 					training_loop(net_adagraph,auxiliar_loader, idx_source, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
-					target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
+					#target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 					test_loader = init_loader(TEST_BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 
 					current_res_source = test(net_std, test_loader, idx_source)
 
-					net_adagraph.set_bn_from_edges(idx_target, ew=edge_vals[idx_target,:])
+					net_adagraph.set_bn_from_edges(idx_target, ew=edge_vals_no_self[idx_target,:])
 					net_adagraph.init_edges(edge_vals)
 
 					current_res_adagraph = test(net_adagraph, test_loader, idx_target)
-					current_res_refinement_stats, current_res_refinement = online_test(net_adagraph,idx_target,target_loader, device=DEVICE)
-
+					#current_res_refinement = online_test(net_adagraph,idx_target,target_loader, device=DEVICE)
 					current_res_upperbound = test(net_upperbound, test_loader, idx_target)
 
 
 					res_source.append(current_res_source)
 					res_adagraph.append(current_res_adagraph)
-					res_adagraph_refinement_stats.append(current_res_refinement_stats)
-					res_adagraph_refinement.append(current_res_refinement)
+					#res_adagraph_refinement.append(current_res_refinement)
 					res_upperbound.append(current_res_upperbound)
 
 
@@ -117,13 +115,11 @@ for meta_source in itertools.product(*DOMAINS):
 					safe_print('-------------------------res after ' + str(len(res_source))+'--------------------------')
 					safe_print('RES STD    '+str(np.mean(np.array(res_source))))
 					safe_print('RES ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
-					safe_print('RES ADAGRAPH REF. STATS   '+str(np.mean(np.array(res_adagraph_refinement_stats))))
-					safe_print('RES ADAGRAPH REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
+					#safe_print('RES ADAGRAPH + REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
 					safe_print('RES UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
 					safe_print('')
 
 np.save('./results/source'+SUFFIX+'.npy', np.array(res_source))
 np.save('./results/adagraph'+SUFFIX+'.npy', np.array(res_adagraph))
-np.save('./results/adagraph_refined_stats'+SUFFIX+'.npy', np.array(res_adagraph_refinement_stats))
 np.save('./results/adagraph_refined'+SUFFIX+'.npy', np.array(res_adagraph_refinement))
 np.save('./results/upper_bound'+SUFFIX+'.npy', np.array(res_upperbound))

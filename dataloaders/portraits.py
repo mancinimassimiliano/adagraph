@@ -8,6 +8,7 @@ import sys
 import os
 import os.path
 import numpy as np
+from random import shuffle
 
 
 REGIONS_DICT={'Alabama': 'South', 'Arizona': 'SW',
@@ -54,11 +55,12 @@ def make_dataset(dir, class_to_idx, extensions, domains):
             available_years = []
             for domain in domains:
                 year,place=domain
-                available_regions.append(place)
-                available_years.append(int(year))
+                if not place in available_regions:
+                    available_regions.append(place)
+                if not int(year) in available_years:
+                    available_years.append(int(year))
 
             available_years = np.array(available_years)
-
             for fname in sorted(fnames):
                 if has_file_allowed_extension(fname, extensions):
                     path = os.path.join(root, fname)
@@ -182,13 +184,13 @@ class PortraitsSampler(torch.utils.data.sampler.Sampler):
     def _sampling(self,idx, n):
         if self.indeces[idx]+n>=len(self.dict_meta[idx]):
             self.dict_meta[idx]=self.dict_meta[idx]+self.dict_meta[idx]
-            self.indeces[idx]=self.indeces[idx]+n
+        self.indeces[idx]=self.indeces[idx]+n
         return self.dict_meta[idx][self.indeces[idx]-n:self.indeces[idx]]
 
 
 
     def _shuffle(self):
-        order=np.random.randint(len(self.keys),size=(len(self.data_source)/(self.bs)))
+        order=np.random.randint(len(self.keys),size=(len(self.data_source)//(self.bs)))
         sIdx=[]
         for i in order:
             sIdx=sIdx+self._sampling(self.keys[i],self.bs)

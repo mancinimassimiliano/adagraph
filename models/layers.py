@@ -61,7 +61,7 @@ class GraphBN(nn.Module):
         for i,bn in enumerate(self.bns):
             means=means+self.edges[d,i]*bn.running_mean
             stds=stds+self.edges[d,i]*bn.running_var
-            return means, stds
+        return means, stds
 
 
     # Initialize BN of a node from an edge
