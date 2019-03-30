@@ -92,7 +92,7 @@ for meta_source in itertools.product(*DOMAINS):
 
 					training_loop(net_adagraph,auxiliar_loader, idx_source, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
-					#target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
+					target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 					test_loader = init_loader(TEST_BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
 
 					current_res_source = test(net_std, test_loader, idx_source)
@@ -101,13 +101,13 @@ for meta_source in itertools.product(*DOMAINS):
 					net_adagraph.init_edges(edge_vals)
 
 					current_res_adagraph = test(net_adagraph, test_loader, idx_target)
-					#current_res_refinement = online_test(net_adagraph,idx_target,target_loader, device=DEVICE)
+					current_res_refinement = online_test(net_adagraph,idx_target,target_loader, device=DEVICE)
 					current_res_upperbound = test(net_upperbound, test_loader, idx_target)
 
 
 					res_source.append(current_res_source)
 					res_adagraph.append(current_res_adagraph)
-					#res_adagraph_refinement.append(current_res_refinement)
+					res_adagraph_refinement.append(current_res_refinement)
 					res_upperbound.append(current_res_upperbound)
 
 
@@ -115,7 +115,7 @@ for meta_source in itertools.product(*DOMAINS):
 					safe_print('-------------------------res after ' + str(len(res_source))+'--------------------------')
 					safe_print('RES STD    '+str(np.mean(np.array(res_source))))
 					safe_print('RES ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
-					#safe_print('RES ADAGRAPH + REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
+					safe_print('RES ADAGRAPH + REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
 					safe_print('RES UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
 					safe_print('')
 
