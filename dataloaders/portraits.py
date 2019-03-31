@@ -40,7 +40,7 @@ REGIONS_TO_IDX={'RM': 6,'MA': 1,'NE': 2,'South': 3, 'Pacific': 4, 'MW': 0 , 'SW'
 IDX_TO_REGIONS={ 6:'RM',1:'MA',2:'NE',3:'South',4: 'Pacific', 0:'MW', 5:'SW'}
 
 
-def make_dataset(dir, class_to_idx, extensions, domains):
+def make_dataset(dir, class_to_idx, extensions, domains,start=1934):
     images = []
     meta = []
 
@@ -51,33 +51,18 @@ def make_dataset(dir, class_to_idx, extensions, domains):
             continue
 
         for root, _, fnames in sorted(os.walk(d)):
-            available_regions = []
-            available_years = []
-            for domain in domains:
-                year,place=domain
-                if not place in available_regions:
-                    available_regions.append(place)
-                if not int(year) in available_years:
-                    available_years.append(int(year))
-
-            available_years = np.array(available_years)
             for fname in sorted(fnames):
                 if has_file_allowed_extension(fname, extensions):
                     path = os.path.join(root, fname)
                     year=int(path.split('/')[-1].split('_')[0])
                     city=(path.split('/')[-1].split('_')[1])
                     region=REGIONS_DICT[city]
-                    delta = (year - available_years)
-                    validity = (delta<10)*(delta>=0)
-                    pivot_index = np.nonzero(validity)
-                    try:
-                        pivot_year = available_years[pivot_index].item()
-                        if region in available_regions:
-                            item = (path, class_to_idx[target])
-                            images.append(item)
-                            meta.append([year,region])
-                    except:
-                        continue
+                    pivot_year=start+(year-start)//10*10
+
+                    if (pivot_year, region) in domains:
+                        item = (path, class_to_idx[target])
+                        images.append(item)
+                        meta.append([year,region])
 
     return images, meta
 
