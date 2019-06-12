@@ -1,5 +1,6 @@
 # Predictive Domain Adaptation with AdaGraph 
 This is the official PyTorch code of [AdaGraph: Unifying Predictive and ContinuousDomain Adaptation through Graphs](http://research.mapillary.com/img/publications/CVPR19b.pdf).
+![alt text](https://raw.githubusercontent.com/mancinimassimiliano/adagraph/origin/img/teaser.png)
 
 This version has been tested on:
 * PyTorch 1.0.1
@@ -27,7 +28,6 @@ Our code allows to perform predictive DA experiments, producing the results for 
 * _Baseline/AdaGraph + Refinement_ (either the _Baseline_ or _AdaGraph_ + our continuous DA strategy)
 * _DA Upper Bound_ (a BN based DA approach with target available before-hand)
 
-
 For reproducing the results on CompCars, please run:
 ```
 python3 main.py --network decaf --suffix test_comp_alexnet --dataset compcars
@@ -46,7 +46,9 @@ for the experiments across regions (i.e. source and target of different regions)
 ```
 python3 main.py --network resnet --suffix portraits_test --dataset portraits --skip decades
 ```
-for the experiments across decades (i.e. source and target of different decades) .
+for the experiments across decades (i.e. source and target of different decades).
+
+The full results of all the models will be stored in the ```./results``` folder, as ```.npy```.
 
 
 ## References
