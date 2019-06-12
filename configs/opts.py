@@ -4,7 +4,7 @@ import argparse
 parser = argparse.ArgumentParser(description='AdaGraph')
 parser.add_argument('--dataset', default = 'compcars', help='Dataset to test (compcars, portraits)')
 parser.add_argument('--network', default='resnet', type=str, help='Network to use (resnet, decaf)')
-parser.add_argument('--skip', default=None, type=str, help='Skip some settings (required only for portraits, eventually). Options are: regions,years.')
+parser.add_argument('--skip', default=None, type=str, help='Skip some settings (required only for portraits, eventually). Options are: regions,decades.')
 parser.add_argument('--suffix', default='./logs/adagraph_test', type=str, help='Suffix to give for storing the experiments')
 
 args = parser.parse_args()
@@ -45,7 +45,7 @@ if SKIP == 'regions':
         source_year, source_region = meta_source
         target_year, target_region = meta_target
         return source_year != target_year
-elif SKIP== 'years':
+elif SKIP== 'decades':
     def skip_rule(meta_source, meta_target):
         source_year, source_region = meta_source
         target_year, target_region = meta_target

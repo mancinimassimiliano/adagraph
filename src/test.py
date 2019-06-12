@@ -26,7 +26,6 @@ def test(net, loader, domain, device='cuda'):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
-    # Save checkpoint.
     acc = 100.*correct/total
     return acc
 
@@ -58,8 +57,7 @@ def single_update(net,inputs,domain,optimizer=None, criterion=None):
 
 
 
-# Full training procedure
-def online_test(net, domain, loader_online,training_group=['bn'], device='cuda'):
+def online_test(net, domain, loader_online,training_group=['bn','downsample.1'], device='cuda', bs=16):
     net_entropy = copy.deepcopy(net)
 
     correct_entropy=0.
@@ -81,7 +79,7 @@ def online_test(net, domain, loader_online,training_group=['bn'], device='cuda')
 
         correct_entropy += single_eval(net_entropy, inputs, current_domain, targets)
 
-        if targets.size(0)>1:
+        if targets.size(0)==bs:
             single_update(net_entropy, inputs, current_domain, optimizer, criterion)
 
     return 100.*correct_entropy/totals
