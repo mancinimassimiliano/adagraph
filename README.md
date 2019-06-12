@@ -15,9 +15,12 @@ pip install -r requirements.txt
 ## Datasets
 For setting up the datasets, please download [CompCars](http://mmlab.ie.cuhk.edu.hk/datasets/comp_cars/index.html) and [A Century of Portraits](http://people.eecs.berkeley.edu/~shiry/projects/yearbooks/yearbooks.html), unpack them and move them into the ```data``` folder. This folder contains also the a file ```data/car-images.txt``` which contains the list of images and metadata+class annotations for CompCars.
 
+<<<<<<< HEAD
 ## Pretrained architectures
 As pretrained models we use the default PyTorch ResNet and the the converted Caffe AlexNet for experiments with decaf. You can find the network at the following [link](https://drive.google.com/file/d/1QoVr4qqbc6RPG0XX-H3SwSAabDxr-Is6/view?usp=sharing). Please download the network and either place it on ```pretrained``` or modify the relative path in ```models/networks.py```.
 
+=======
+>>>>>>> 70cace8b93e035ca74281f5768ab58fce0b2e520
 
 ## Predictive DA experiments
 Our code allows to perform predictive DA experiments, producing the results for the following methods:
