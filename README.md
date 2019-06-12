@@ -1,6 +1,6 @@
 # Predictive Domain Adaptation with AdaGraph 
 This is the official PyTorch code of [AdaGraph: Unifying Predictive and ContinuousDomain Adaptation through Graphs](http://research.mapillary.com/img/publications/CVPR19b.pdf).
-![alt text](https://raw.githubusercontent.com/mancinimassimiliano/adagraph/origin/img/teaser.png)
+![alt text](https://raw.githubusercontent.com/mancinimassimiliano/adagraph/master/img/teaser.png)
 
 This version has been tested on:
 * PyTorch 1.0.1
