@@ -63,7 +63,7 @@ for meta_source in itertools.product(*DOMAINS):
 			net_std.copy_source(idx_source)
 
 			net_upperbound=copy.deepcopy(net_std)
-			net_upperbound.init_edges(edge_vals)   ##### CHOICE
+			net_upperbound.init_edges(edge_vals)
 
 			training_loop(net_upperbound,upperbound_loader, idx_source,epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
