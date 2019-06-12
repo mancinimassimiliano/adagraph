@@ -5,6 +5,7 @@ from configs.opts import *
 from src.train import *
 from src.test import *
 from models.networks import get_network
+import random
 
 import copy
 import numpy as np
@@ -41,6 +42,7 @@ for i,vector in enumerate(meta_vectors):
 EXP=NUM_DOMS*(NUM_DOMS-1)
 
 res_source=[]
+res_refined=[]
 res_upperbound=[]
 res_upperbound_ref=[]
 res_adagraph=[]
@@ -63,7 +65,7 @@ for meta_source in itertools.product(*DOMAINS):
 			net_upperbound=copy.deepcopy(net_std)
 			net_upperbound.init_edges(edge_vals)   ##### CHOICE
 
-			training_loop(net_upperbound,upperbound_loader, idx_source, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
+			training_loop(net_upperbound,upperbound_loader, idx_source,epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
 			for meta_target in itertools.product(*DOMAINS):
 					target_domain=meta_target
@@ -78,8 +80,6 @@ for meta_source in itertools.product(*DOMAINS):
 					current_edges=copy.deepcopy(edge_vals)
 					current_edges[:,idx_target]=0.0
 
-					test_edges=copy.deepcopy(edge_vals_no_self)
-
 					current_edges=current_edges/current_edges.sum(-1).unsqueeze(-1)
 					current_edges[idx_target,:]=0.0
 
@@ -91,7 +91,7 @@ for meta_source in itertools.product(*DOMAINS):
 					net_adagraph=copy.deepcopy(net_std)
 					net_adagraph.init_edges(current_edges)
 
-					training_loop(net_adagraph,auxiliar_loader, idx_source, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
+					training_loop(net_adagraph,auxiliar_loader, idx_source, target_idx=idx_target, epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
 					target_loader = init_loader(BATCH_SIZE, domains=[target_domain], shuffle=True, auxiliar=False, size=SIZE, std=STD)
 					test_loader = init_loader(TEST_BATCH_SIZE, domains=[target_domain], shuffle=False, auxiliar=False, size=SIZE, std=STD)
@@ -101,15 +101,19 @@ for meta_source in itertools.product(*DOMAINS):
 					net_adagraph.set_bn_from_edges(idx_target, ew=edge_vals_no_self[idx_target,:])
 					net_adagraph.init_edges(edge_vals)
 
+					net_refined = copy.deepcopy(net_std)
+
 					current_res_adagraph = test(net_adagraph, test_loader, idx_target)
-					current_res_refinement = online_test(net_adagraph,idx_target,target_loader, device=DEVICE)
+					current_res_refined = online_test(net_refined,idx_target,target_loader, training_group=TRAINING_GROUP, device=DEVICE, bs=BATCH_SIZE)
+					current_res_ag_refinement = online_test(net_adagraph,idx_target,target_loader, training_group=TRAINING_GROUP, device=DEVICE, bs=BATCH_SIZE)
 					current_res_upperbound = test(net_upperbound, test_loader, idx_target)
-					current_res_upperbound_refined = online_test(net_upperbound,idx_target,target_loader, device=DEVICE)
+					current_res_upperbound_refined = online_test(net_upperbound,idx_target,target_loader, training_group=TRAINING_GROUP, device=DEVICE, bs=BATCH_SIZE)
 
 
 					res_source.append(current_res_source)
+					res_refined.append(current_res_refined)
 					res_adagraph.append(current_res_adagraph)
-					res_adagraph_refinement.append(current_res_refinement)
+					res_adagraph_refinement.append(current_res_ag_refinement)
 					res_upperbound.append(current_res_upperbound)
 					res_upperbound_ref.append(current_res_upperbound_refined)
 
@@ -117,6 +121,7 @@ for meta_source in itertools.product(*DOMAINS):
 
 					safe_print('-------------------------res after ' + str(len(res_source))+'--------------------------')
 					safe_print('RES STD    '+str(np.mean(np.array(res_source))))
+					safe_print('RES REFINED    '+str(np.mean(np.array(res_refined))))
 					safe_print('RES ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
 					safe_print('RES ADAGRAPH + REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
 					safe_print('RES UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
@@ -124,6 +129,7 @@ for meta_source in itertools.product(*DOMAINS):
 					safe_print('')
 
 np.save('./results/source'+SUFFIX+'.npy', np.array(res_source))
+np.save('./results/refined'+SUFFIX+'.npy', np.array(res_refined))
 np.save('./results/adagraph'+SUFFIX+'.npy', np.array(res_adagraph))
 np.save('./results/adagraph_refined'+SUFFIX+'.npy', np.array(res_adagraph_refinement))
 np.save('./results/upper_bound'+SUFFIX+'.npy', np.array(res_upperbound))

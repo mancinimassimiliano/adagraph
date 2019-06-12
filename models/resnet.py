@@ -214,8 +214,8 @@ def resnet18_domain(classes=4, domains=30, url=None, **kwargs):
                 if m_doms[0]==m_orig[0]:
                     c+=1
                     for i in range(domains):
-                        m_doms[1].bns[i].running_var[:]=m_orig[1].running_var.data[:]
-                        m_doms[1].bns[i].running_mean[:]=m_orig[1].running_mean.data[:]
+                        m_doms[1].bns[i].running_var.data[:]=m_orig[1].running_var.data[:]
+                        m_doms[1].bns[i].running_mean.data[:]=m_orig[1].running_mean.data[:]
                         m_doms[1].scale.data[i,:]=m_orig[1].weight.data[:]
                         m_doms[1].bias.data[i,:]=m_orig[1].bias.data[:]
 

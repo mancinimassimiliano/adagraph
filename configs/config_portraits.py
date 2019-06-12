@@ -21,7 +21,7 @@ CLASSES = 2
 DOMAINS = [DATES, REGIONS]
 NUM_META = 3
 
-DATAROOT='/home/mancini/data/oda/faces/'
+DATAROOT='./data/faces/'
 
 REGION_TO_VEC={'MA': [0,.1],'NE': [0.,0.],'South': [1.,1.], 'Pacific': [0.,3.], 'MW': [0.,2.]}
 

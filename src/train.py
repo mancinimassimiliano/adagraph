@@ -9,7 +9,7 @@ from configs.opts import *
 
 
 # Full training procedure
-def training_loop(net, loader, domain, epochs=10, training_group=["bn"], store=None, auxiliar=False):
+def training_loop(net, loader, domain, target_idx=-1, epochs=10, training_group=["bn"], store=None, auxiliar=False):
     lr=LR
     if auxiliar:
         lr=lr*0.1
@@ -19,7 +19,7 @@ def training_loop(net, loader, domain, epochs=10, training_group=["bn"], store=N
 
     for epoch in range(1, 1+epochs):
         # Perform 1 training epoch
-        train(net, domain, loader, optimizer)
+        train(net, domain, target_idx, loader, optimizer)
         if epoch==STEP:
             lr=lr*0.1
             optimizer = set_up_optim(net, lr, auxiliar, RESIDUAL)
@@ -33,7 +33,7 @@ def training_loop(net, loader, domain, epochs=10, training_group=["bn"], store=N
 
 
 # Training, single epoch
-def train(net, source, loader, optimizer):
+def train(net, source, idx_target, loader, optimizer):
     net.train()
     train_loss = 0
 
@@ -52,6 +52,8 @@ def train(net, source, loader, optimizer):
 
         current_domain=domain_converter((meta[0][0],meta[1][0]))
 
+        assert current_domain != idx_target, "The target is used while training AdaGraph. This is wrong."
+
         # Produce features
         prediction = net(inputs, current_domain)
 
@@ -65,7 +67,6 @@ def train(net, source, loader, optimizer):
         optimizer.step()
         optimizer.zero_grad()
 
-        # safe_printing stuff
         train_loss += loss.item()
 
     return (train_loss/(batch_idx+1))

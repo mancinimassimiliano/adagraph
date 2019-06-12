@@ -23,7 +23,7 @@ CLASSES = 4
 DOMAINS = [DATES, VIEWS]
 NUM_META = 2
 
-DATALIST='/home/mancini/data/oda/compcars/images.txt' #TO CHANGE
+DATALIST='./data/car-images.txt'
 
 
 def domain_converter(meta):
@@ -36,11 +36,9 @@ def domain_converter(meta):
 def init_loader(bs, domains=[], shuffle=False, auxiliar= False, size=224, std=[0.229, 0.224, 0.225]):
     data_transform=transforms.Compose([
             transforms.Resize((size,size)),
-                   #transforms.CenterCrop(size),
                       transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], std)
          ])
-
 
     dataset = Compcars(DATALIST,['1','2','3','4'],transform=data_transform,domains=domains)
 
@@ -58,4 +56,5 @@ def compute_edge(x,dt,idx, self_connection = 1.):
 
 
 def get_meta_vector(meta):
-	return torch.FloatTensor([float(i) for i in meta])
+	year, viewpoint = meta
+	return torch.FloatTensor([float(year)-float(DATES[0]),float(viewpoint)-float(VIEWS[0])])
