@@ -63,11 +63,7 @@ for meta_source in itertools.product(*DOMAINS):
 			net_std.copy_source(idx_source)
 
 			net_upperbound=copy.deepcopy(net_std)
-<<<<<<< HEAD
 			net_upperbound.init_edges(edge_vals)
-=======
-			net_upperbound.init_edges(edge_vals)   ##### CHOICE
->>>>>>> 70cace8b93e035ca74281f5768ab58fce0b2e520
 
 			training_loop(net_upperbound,upperbound_loader, idx_source,epochs=1, training_group=TRAINING_GROUP, store=None, auxiliar=True)
 
@@ -124,21 +120,12 @@ for meta_source in itertools.product(*DOMAINS):
 
 
 					safe_print('-------------------------res after ' + str(len(res_source))+'--------------------------')
-<<<<<<< HEAD
 					safe_print('BASELINE    '+str(np.mean(np.array(res_source))))
 					safe_print('BASELINE + REFINEMENT    '+str(np.mean(np.array(res_refined))))
 					safe_print('ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
 					safe_print('ADAGRAPH + REFINEMENT    '+str(np.mean(np.array(res_adagraph_refinement))))
 					safe_print('UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
 					safe_print('UPPER BOUND + REFINEMENT  '+str(np.mean(np.array(res_upperbound_ref))))
-=======
-					safe_print('RES STD    '+str(np.mean(np.array(res_source))))
-					safe_print('RES REFINED    '+str(np.mean(np.array(res_refined))))
-					safe_print('RES ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
-					safe_print('RES ADAGRAPH + REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
-					safe_print('RES UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
-					safe_print('RES UPPER BOUND + REF.  '+str(np.mean(np.array(res_upperbound_ref))))
->>>>>>> 70cace8b93e035ca74281f5768ab58fce0b2e520
 					safe_print('')
 
 np.save('./results/source'+SUFFIX+'.npy', np.array(res_source))
