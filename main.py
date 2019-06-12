@@ -120,12 +120,12 @@ for meta_source in itertools.product(*DOMAINS):
 
 
 					safe_print('-------------------------res after ' + str(len(res_source))+'--------------------------')
-					safe_print('RES STD    '+str(np.mean(np.array(res_source))))
-					safe_print('RES REFINED    '+str(np.mean(np.array(res_refined))))
-					safe_print('RES ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
-					safe_print('RES ADAGRAPH + REF.    '+str(np.mean(np.array(res_adagraph_refinement))))
-					safe_print('RES UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
-					safe_print('RES UPPER BOUND + REF.  '+str(np.mean(np.array(res_upperbound_ref))))
+					safe_print('BASELINE    '+str(np.mean(np.array(res_source))))
+					safe_print('BASELINE + REFINEMENT    '+str(np.mean(np.array(res_refined))))
+					safe_print('ADAGRAPH    '+str(np.mean(np.array(res_adagraph))))
+					safe_print('ADAGRAPH + REFINEMENT    '+str(np.mean(np.array(res_adagraph_refinement))))
+					safe_print('UPPER BOUND    '+str(np.mean(np.array(res_upperbound))))
+					safe_print('UPPER BOUND + REFINEMENT  '+str(np.mean(np.array(res_upperbound_ref))))
 					safe_print('')
 
 np.save('./results/source'+SUFFIX+'.npy', np.array(res_source))
