@@ -75,22 +75,6 @@ class GraphBN(nn.Module):
         self.scale.data[d]=scale.view(-1)
         self.bias.data[d]=bias.view(-1)
 
-
-    # Initialize BN of a node from probabilties on domains
-    def set_bn_from_probs(self, x, w):
-        means=torch.FloatTensor(w.size(0),self.features).fill_(0.).to(self.scale.device)
-        stds=torch.FloatTensor(w.size(0),self.features).fill_(0.).to(self.scale.device)
-        scale=torch.FloatTensor(w.size(0),self.features).fill_(0.).to(self.scale.device)
-        bias=torch.FloatTensor(w.size(0),self.features).fill_(0.).to(self.scale.device)
-
-        probs = w.unsqueeze(2)
-        means = (probs*self.collected_means).sum(1)
-        stds = (probs*self.collected_stds).sum(1)
-        scale = (probs*self.scale.unsqueeze(0)).sum(1)
-        bias = (probs*self.bias.unsqueeze(0)).sum(1)
-        x=(x-means)/(torch.pow(stds+self.bns[0].eps,0.5))
-        return scale*x+bias
-
     ############################
     #### EDGES MANIPULATION ####
     ############################
