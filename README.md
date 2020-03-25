@@ -34,7 +34,7 @@ python3 main.py --network decaf --suffix test_comp_alexnet --dataset compcars
 ```
 for the experiments with the decaf features and:
 ```
-python3 main.py --network resnet --suffix test_comp_alexnet --dataset compcars
+python3 main.py --network resnet --suffix test_comp_resnet --dataset compcars
 ```
 for the experiments with ResNet-18.
 
@@ -56,7 +56,7 @@ The full results of all the models will be stored in the ```./results``` folder,
 If you find this code useful, please cite:
 
     @inProceedings{mancini2019adagraph,
-	author = {Mancini, Massimilano and Rota Bul\`o, Samuel and Caputo, Barbara and Ricci, Elisa},
+	author = {Mancini, Massimiliano and Rota Bul\`o, Samuel and Caputo, Barbara and Ricci, Elisa},
   	title  = {AdaGraph: Unifying Predictive and ContinuousDomain Adaptation through Graphs},
   	booktitle = {Computer Vision and Pattern Recognition (CVPR)},
   	year      = {2019},
