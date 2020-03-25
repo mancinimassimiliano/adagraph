@@ -57,7 +57,7 @@ If you find this code useful, please cite:
 
     @inProceedings{mancini2019adagraph,
 	author = {Mancini, Massimiliano and Rota Bul\`o, Samuel and Caputo, Barbara and Ricci, Elisa},
-  	title  = {AdaGraph: Unifying Predictive and ContinuousDomain Adaptation through Graphs},
+  	title  = {AdaGraph: Unifying Predictive and Continuous Domain Adaptation through Graphs},
   	booktitle = {Computer Vision and Pattern Recognition (CVPR)},
   	year      = {2019},
   	month     = {June}
