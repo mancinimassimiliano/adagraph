@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ```
 
 ## Datasets
-For setting up the datasets, please download [CompCars](http://mmlab.ie.cuhk.edu.hk/datasets/comp_cars/index.html) and [A Century of Portraits](http://people.eecs.berkeley.edu/~shiry/projects/yearbooks/yearbooks.html), unpack them and move them into the ```data``` folder. This folder contains also the a file ```data/car-images.txt``` which contains the list of images and metadata+class annotations for CompCars.
+For setting up the datasets, please download [CompCars](http://mmlab.ie.cuhk.edu.hk/datasets/comp_cars/index.html) and [A Century of Portraits](http://people.eecs.berkeley.edu/~shiry/projects/yearbooks/yearbooks.html), unpack them and move them into the ```data``` folder. This folder contains also the file ```data/car-images.txt``` which contains the list of images and metadata+class annotations for CompCars.
 
 ## Pretrained architectures
 As pretrained models we use the default PyTorch ResNet and the the converted Caffe AlexNet for experiments with decaf. You can find the network at the following [link](https://drive.google.com/file/d/1QoVr4qqbc6RPG0XX-H3SwSAabDxr-Is6/view?usp=sharing). Please download the network and either place it on ```pretrained``` or modify the relative path in ```models/networks.py```.
